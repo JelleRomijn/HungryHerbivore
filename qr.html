@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>10% Korting – Hungry Herbivore</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a472a 0%, #2d7a3a 60%, #4caf50 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 48px 40px 40px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.30);
+    position: relative;
+    animation: popIn 0.5s cubic-bezier(.175,.885,.32,1.275) both;
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.85) translateY(20px); }
+    to   { opacity: 1; transform: scale(1)   translateY(0); }
+  }
+
+  .badge {
+    position: absolute;
+    top: -24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff6f00;
+    color: #fff;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 20px;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(255,111,0,.4);
+  }
+
+  .logo-wrap {
+    margin-bottom: 16px;
+  }
+
+  .logo-wrap img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+
+  .brand {
+    font-size: 15px;
+    color: #888;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .discount-number {
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 1;
+    color: #2d7a3a;
+    letter-spacing: -4px;
+  }
+
+  .discount-pct {
+    font-size: 48px;
+    font-weight: 700;
+    color: #2d7a3a;
+    vertical-align: super;
+    letter-spacing: -2px;
+  }
+
+  .discount-label {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .discount-sub {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 32px;
+    line-height: 1.5;
+  }
+
+  .redirect-bar {
+    background: #f5f5f5;
+    border-radius: 12px;
+    padding: 14px 20px;
+    margin-bottom: 8px;
+  }
+
+  .redirect-text {
+    font-size: 14px;
+    color: #444;
+    margin-bottom: 8px;
+  }
+
+  .progress-track {
+    background: #e0e0e0;
+    border-radius: 99px;
+    height: 6px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2d7a3a, #4caf50);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 3s linear;
+  }
+
+  .cta-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    background: #2d7a3a;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    margin-top: 16px;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  .cta-btn:hover {
+    background: #1a5c28;
+    transform: translateY(-1px);
+  }
+
+  .cta-btn:active {
+    transform: translateY(0);
+  }
+
+  .leaf {
+    position: fixed;
+    font-size: 40px;
+    opacity: 0.08;
+    pointer-events: none;
+    user-select: none;
+  }
+  .leaf:nth-child(1) { top: 8%;  left: 5%;  transform: rotate(-20deg); font-size: 60px; }
+  .leaf:nth-child(2) { top: 15%; right: 6%; transform: rotate(30deg);  font-size: 50px; }
+  .leaf:nth-child(3) { bottom: 10%; left: 8%; transform: rotate(10deg); font-size: 70px; }
+  .leaf:nth-child(4) { bottom: 18%; right: 4%; transform: rotate(-35deg); font-size: 45px; }
+</style>
+</head>
+<body>
+
+<span class="leaf">🌿</span>
+<span class="leaf">🌱</span>
+<span class="leaf">🍃</span>
+<span class="leaf">🌾</span>
+
+<div class="card">
+  <div class="badge">Exclusieve aanbieding</div>
+
+  <div class="logo-wrap">
+    <img src="img/dansendino.gif" alt="Hungry Herbivore" onerror="this.style.display='none'">
+  </div>
+
+  <p class="brand">Hungry Herbivore</p>
+
+  <div>
+    <span class="discount-number">10</span><span class="discount-pct">%</span>
+  </div>
+
+  <p class="discount-label">Korting op je bestelling!</p>
+  <p class="discount-sub">
+    Scan, bestel en geniet van 10% korting<br>op je gehele bestelling vandaag.
+  </p>
+
+  <div class="redirect-bar">
+    <p class="redirect-text" id="redirect-text">Je wordt doorgestuurd naar de bestelpagina…</p>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <a class="cta-btn" href="index.php?promo=KIOSK10" id="cta-btn">
+    Nu bestellen met 10% korting →
+  </a>
+</div>
+
+<script>
+  // Sla de kortingscode op in sessionStorage
+  try {
+    sessionStorage.setItem('qrDiscount', 'KIOSK10');
+  } catch (e) {}
+
+  // Start de voortgangsbalk en redirect na 3 seconden
+  var fill = document.getElementById('progress-fill');
+  var redirectText = document.getElementById('redirect-text');
+  var seconds = 3;
+
+  // Start de animatie
+  requestAnimationFrame(function() {
+    fill.style.width = '100%';
+  });
+
+  var countdown = setInterval(function() {
+    seconds--;
+    if (seconds > 0) {
+      redirectText.textContent = 'Je wordt doorgestuurd in ' + seconds + ' seconde' + (seconds !== 1 ? 'n' : '') + '…';
+    } else {
+      clearInterval(countdown);
+      window.location.href = 'index.php?promo=KIOSK10';
+    }
+  }, 1000);
+</script>
+
+</body>
+</html>

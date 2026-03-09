@@ -47,18 +47,18 @@ function getFallbackImages(): array
     ];
 }
 
-function getCarouselImages(): array
+function buildCarouselFromProducts(array $items): array
 {
-    return [
-        'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1550547660-d9450f859349?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=1200&fit=crop',
-        'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=1200&fit=crop',
-    ];
+    $seen = [];
+    $images = [];
+    foreach ($items as $item) {
+        $img = $item['image'];
+        if (!in_array($img, $seen, true)) {
+            $seen[] = $img;
+            $images[] = $img;
+        }
+    }
+    return $images;
 }
 
 function getCategoryLabels(): array
@@ -87,11 +87,11 @@ function buildCategories(array $categoryLabels): array
 
 function resolveProductTag(string $name): string
 {
-    if (str_contains($name, '(VG)')) {
+    if (strpos($name, '(VG)') !== false) {
         return 'VG';
     }
 
-    if (str_contains($name, '(V)')) {
+    if (strpos($name, '(V)') !== false) {
         return 'V';
     }
 
@@ -141,7 +141,6 @@ function fetchAvailableProducts(mysqli $mysqli, array $fallbackImages): array
 $dbError = '';
 $items = [];
 $fallbackImages = getFallbackImages();
-$carouselImages = getCarouselImages();
 $categories = buildCategories(getCategoryLabels());
 
 $mysqli = createDatabaseConnection(getDatabaseConfig());
@@ -151,6 +150,18 @@ if ($mysqli->connect_errno) {
     $mysqli->set_charset('utf8mb4');
     $items = fetchAvailableProducts($mysqli, $fallbackImages);
 }
+
+$carouselImages = buildCarouselFromProducts($items);
+
+// Fallback als er geen productafbeeldingen zijn
+if (empty($carouselImages)) {
+    $carouselImages = array_values($fallbackImages);
+}
+
+// Upsell: 2 drankjes (cat 6) + 1 saus (cat 5)
+$upsellDrinks = array_slice(array_values(array_filter($items, function($i) { return $i['category_id'] === 6; })), 0, 2);
+$upsellSauces = array_slice(array_values(array_filter($items, function($i) { return $i['category_id'] === 5; })), 0, 1);
+$upsellItems  = array_merge($upsellDrinks, $upsellSauces);
 ?>
 <!DOCTYPE html>
 <html lang="nl">
@@ -184,25 +195,25 @@ if ($mysqli->connect_errno) {
     <!-- Groene gloed effect -->
     <div class="welcome-glow"></div>
 
+
+    
+
+
+
     <!-- Centraal content -->
     <div class="welcome-center">
         <div class="welcome-logo">
-            <img src="https://img.notionusercontent.com/s3/prod-files-secure%2F0216a67a-859e-4730-996f-5d51b31fa395%2F7c10c1b1-c60b-4e04-9ea3-40cb0fe1a6e1%2Flogo_big_complete_transparent.png/size/w=410?exp=1770726629&sig=2foQVcUIt5aUn5Z5VLv574VSUUBQp01M09NmTKkuJjE&id=2e769bb8-092d-815e-a424-f2becdccb3a2&table=block" alt="Happy Herbivore Logo">
+            <div class="welcome-logo-inner">
+                <img class="welcome-dino-gif" src="img/dansendino.gif" autoplay loop muted playsinline/> 	
+            </div>
         </div>
-        <p class="welcome-tagline-top" data-i18n="welcome.subtitle">Healthy in a hurry</p>
         <button class="welcome-start-btn" id="welcome-start-btn" data-i18n="welcome.start">
             Raak aan om te starten
         </button>
         <p class="welcome-tagline" data-i18n="welcome.tagline">Gezond &bull; Vers &bull; Plantaardig</p>
     </div>
 
-    <!-- Hint onderaan -->
-    <div class="welcome-hint">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"/>
-        </svg>
-        <span data-i18n="welcome.hint">Tik ergens om te beginnen</span>
-    </div>
+   
 
     <!-- Taalkeuze -->
     <div class="language-selector">
@@ -222,6 +233,44 @@ if ($mysqli->connect_errno) {
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════════════════════
+     DINE-IN / TAKEAWAY KEUZE
+     ═══════════════════════════════════════════════════════════════════════════════ -->
+<div class="screen dine-screen" data-screen="dine">
+    <div class="dine-bg"></div>
+    <div class="welcome-glow"></div>
+
+    <div class="dine-center">
+        <h1 class="dine-title" data-i18n="dine.title">Waar wil je eten?</h1>
+        <div class="dine-options">
+            <button class="dine-btn" id="dine-here-btn">
+                <div class="dine-btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 11l19-9-9 19-2-8-8-2z"/>
+                    </svg>
+                </div>
+                <span data-i18n="dine.here">Hier eten</span>
+            </button>
+            <button class="dine-btn" id="takeaway-btn">
+                <div class="dine-btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </div>
+                <span data-i18n="dine.takeaway">Meenemen</span>
+            </button>
+        </div>
+    </div>
+
+    <button class="dine-back-btn" id="dine-back-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+    </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════════
      BESTELSCHERM
      ═══════════════════════════════════════════════════════════════════════════════ -->
 <div class="screen order-screen" data-screen="order">
@@ -229,8 +278,7 @@ if ($mysqli->connect_errno) {
     <aside class="order-sidebar">
         <div class="sidebar-header">
             <div class="sidebar-brand">
-                <img class="sidebar-logo-small" src="https://img.notionusercontent.com/s3/prod-files-secure%2F0216a67a-859e-4730-996f-5d51b31fa395%2F58edc398-a183-41b1-b8b5-a800367697dc%2Flogo_big_dinosaur_transparent.png/size/w=410?exp=1770459616&sig=gt1jbJEyKpuPhxyZY1ZOFtXnBDrxpt-kMoT97wHIyiM&id=2e769bb8-092d-815e-a27b-e5132b99e81a&table=block" alt="Happy Herbivore Dino">
-                <img class="sidebar-logo-text" src="https://img.notionusercontent.com/s3/prod-files-secure%2F0216a67a-859e-4730-996f-5d51b31fa395%2F41dca380-aef7-4a7c-bbdb-04294d9580f3%2Flogo_big_happy_herbivore_transparent.png/size/w=410?exp=1770459615&sig=AbXzOoDRUjawRQQldgwgfUb97uOujwIU3mk5nDv0eg0&id=2e769bb8-092d-817c-aef9-decb4d448961&table=block" alt="Happy Herbivore">
+                <img class="sidebar-logo-text" src="img/logo_big_complete_transparent.png" alt="Happy Herbivore">
             </div>
             <p class="sidebar-subtitle" data-i18n="common.selectCategory">Selecteer een categorie</p>
         </div>
@@ -244,6 +292,33 @@ if ($mysqli->connect_errno) {
                     <?php echo htmlspecialchars($cat['name']); ?>
                 </button>
             <?php endforeach; ?>
+        </div>
+
+        <!-- Taalvlaggen onderaan sidebar - inklap menu -->
+        <div class="sidebar-lang-flags">
+            <div class="sidebar-lang-dropdown" id="sidebar-lang-dropdown">
+                <button class="sidebar-lang-btn active" data-lang="nl" title="Nederlands">
+                    <img src="https://flagcdn.com/w80/nl.png" alt="NL">
+                    <span class="sidebar-lang-btn-label">Nederlands</span>
+                </button>
+                <button class="sidebar-lang-btn" data-lang="en" title="English">
+                    <img src="https://flagcdn.com/w80/gb.png" alt="EN">
+                    <span class="sidebar-lang-btn-label">English</span>
+                </button>
+                <button class="sidebar-lang-btn" data-lang="fr" title="Français">
+                    <img src="https://flagcdn.com/w80/fr.png" alt="FR">
+                    <span class="sidebar-lang-btn-label">Français</span>
+                </button>
+                <button class="sidebar-lang-btn" data-lang="de" title="Deutsch">
+                    <img src="https://flagcdn.com/w80/de.png" alt="DE">
+                    <span class="sidebar-lang-btn-label">Deutsch</span>
+                </button>
+            </div>
+            <button class="sidebar-lang-toggle" id="sidebar-lang-toggle" title="Taal kiezen">
+                <img class="sidebar-lang-toggle-flag" id="sidebar-active-flag" src="https://flagcdn.com/w80/nl.png" alt="NL">
+                <span class="sidebar-lang-toggle-label">Taal / Language</span>
+                <svg class="sidebar-lang-toggle-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+            </button>
         </div>
     </aside>
 
@@ -278,7 +353,7 @@ if ($mysqli->connect_errno) {
                             <p class="product-desc"><?php echo htmlspecialchars($item['description']); ?></p>
                             <p class="product-kcal"><?php echo (int)$item['kcal']; ?> kcal</p>
                             <div class="product-card-footer">
-                                <span class="product-price">&euro;<?php echo number_format($item['price'], 2); ?></span>
+                                <span class="product-price">&euro;<?php echo number_format($item['price'], 2, ',', ''); ?></span>
                                 <div class="product-actions">
                                     <!-- JS voegt hier add-knop of qty-controls toe -->
                                 </div>
@@ -302,6 +377,7 @@ if ($mysqli->connect_errno) {
                     <div class="cart-label" id="cart-label">Total (0 items)</div>
                     <div class="cart-amount" id="cart-total">&euro;0,00</div>
                 </div>
+                <span id="cart-discount-badge" class="cart-discount-badge" style="display:none">10% korting</span>
             </div>
             <button class="review-order-btn" id="go-review-btn" disabled data-i18n="common.reviewOrder">
                 Bestelling Bekijken
@@ -349,15 +425,15 @@ if ($mysqli->connect_errno) {
             <span class="kcal-total" id="review-kcal">0</span>
         </div>
         <div class="review-totals">
-            <div class="review-totals-row">
-                <span data-i18n="common.subtotal">Subtotaal</span>
-                <span id="review-subtotal">&euro;0,00</span>
-            </div>
-            <div class="review-totals-row">
-                <span><span data-i18n="common.tax">BTW</span> (9%)</span>
-                <span id="review-tax">&euro;0,00</span>
-            </div>
             <div class="review-totals-divider"></div>
+            <div class="review-totals-row subtotal-row" id="subtotal-row" style="display:none">
+                <span>Subtotaal</span>
+                <span class="subtotal-value" id="review-subtotal-value">&euro;0,00</span>
+            </div>
+            <div class="review-totals-row discount-row" id="discount-row" style="display:none">
+                <span class="discount-label-text">🏷 10% QR-korting</span>
+                <span class="discount-value" id="review-discount-value">− &euro;0,00</span>
+            </div>
             <div class="review-totals-row total-row">
                 <span data-i18n="common.total">Totaal</span>
                 <span class="total-value" id="review-total">&euro;0,00</span>
@@ -381,9 +457,13 @@ if ($mysqli->connect_errno) {
 
     <div class="upsell-items-wrapper">
         <div class="upsell-grid" id="upsell-grid">
-            <div class="upsell-card" data-upsell-id="u1" data-upsell-price="3.99">
+            <?php foreach ($upsellItems as $idx => $upsell): ?>
+            <div class="upsell-card"
+                 data-upsell-id="u<?php echo $idx + 1; ?>"
+                 data-product-id="<?php echo (int)$upsell['id']; ?>"
+                 data-upsell-price="<?php echo number_format($upsell['price'], 2, '.', ''); ?>">
                 <div class="upsell-card-img">
-                    <img src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?w=400&fit=crop" alt="Chia Seed Pudding" loading="lazy">
+                    <img src="<?php echo htmlspecialchars($upsell['image']); ?>" alt="<?php echo htmlspecialchars($upsell['title']); ?>" loading="lazy">
                     <div class="upsell-selected-overlay">
                         <div class="upsell-check-circle">
                             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -393,56 +473,15 @@ if ($mysqli->connect_errno) {
                     </div>
                 </div>
                 <div class="upsell-card-body">
-                    <h3>Chia Seed Pudding</h3>
-                    <p class="upsell-desc">Vanilla chia pudding with berries</p>
+                    <h3><?php echo htmlspecialchars($upsell['title']); ?></h3>
+                    <p class="upsell-desc"><?php echo htmlspecialchars($upsell['description']); ?></p>
                     <div class="upsell-card-bottom">
-                        <span class="upsell-price">+&euro;3,99</span>
+                        <span class="upsell-price">+&euro;<?php echo number_format($upsell['price'], 2, ',', ''); ?></span>
                         <span class="upsell-status not-added" data-i18n="common.add">Toevoegen</span>
                     </div>
                 </div>
             </div>
-
-            <div class="upsell-card" data-upsell-id="u2" data-upsell-price="4.50">
-                <div class="upsell-card-img">
-                    <img src="https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=400&fit=crop" alt="Fresh Pressed Juice" loading="lazy">
-                    <div class="upsell-selected-overlay">
-                        <div class="upsell-check-circle">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="upsell-card-body">
-                    <h3>Fresh Pressed Juice</h3>
-                    <p class="upsell-desc">Add a vitamin-packed juice</p>
-                    <div class="upsell-card-bottom">
-                        <span class="upsell-price">+&euro;4,50</span>
-                        <span class="upsell-status not-added" data-i18n="common.add">Toevoegen</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="upsell-card" data-upsell-id="u3" data-upsell-price="2.99">
-                <div class="upsell-card-img">
-                    <img src="https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&fit=crop" alt="Energy Protein Ball" loading="lazy">
-                    <div class="upsell-selected-overlay">
-                        <div class="upsell-check-circle">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-                <div class="upsell-card-body">
-                    <h3>Energy Protein Ball</h3>
-                    <p class="upsell-desc">Dates, nuts &amp; cacao</p>
-                    <div class="upsell-card-bottom">
-                        <span class="upsell-price">+&euro;2,99</span>
-                        <span class="upsell-status not-added" data-i18n="common.add">Toevoegen</span>
-                    </div>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -468,45 +507,66 @@ if ($mysqli->connect_errno) {
     <!-- Restaurant achtergrond -->
     <div class="conf-bg">
         <img src="img/restaurant-bg.png" alt="Happy Herbivore Restaurant">
+        <div class="conf-bg-overlay"></div>
     </div>
 
-    <!-- Bovenste balk: bedankje + order naam -->
-    <div class="conf-top-bar">
-        <div class="conf-thanks">
-            <h2 data-i18n="confirmation.thanks">Thanks!</h2>
-            <p data-i18n="confirmation.ready">Your order will be ready soon!</p>
-        </div>
-        <div class="conf-order-name">
-            <div class="conf-name-value" id="confirmation-number">A-101</div>
-            <div class="conf-name-label" data-i18n="confirmation.orderName">Order name</div>
-        </div>
-    </div>
+    <!-- Content wrapper -->
+    <div class="conf-content">
+        <!-- Bevestigingskaart -->
+        <div class="conf-card">
+            <div class="conf-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+            <h2 class="conf-card-title" data-i18n="confirmation.thanks">Thanks!</h2>
+            <p class="conf-card-subtitle" data-i18n="confirmation.ready">Your order will be ready soon!</p>
 
-    <!-- Ruimte voor achtergrond (logo zit in de foto) -->
-    <div class="conf-center-spacer"></div>
+            <div class="conf-order-badge">
+                <span class="conf-order-label" data-i18n="confirmation.orderName">Order name</span>
+                <span class="conf-order-number" id="confirmation-number">A-101</span>
+            </div>
+        </div>
 
-    <!-- Onderste balk: taalvlaggen + nieuwe bestelling knop -->
-    <div class="conf-bottom-bar">
-        <div class="conf-lang-flags">
-            <button class="conf-lang-btn" data-lang="nl" title="Nederlands">
-                <img src="https://flagcdn.com/w80/nl.png" alt="NL">
-            </button>
-            <button class="conf-lang-btn" data-lang="en" title="English">
-                <img src="https://flagcdn.com/w80/gb.png" alt="EN">
-            </button>
-            <button class="conf-lang-btn" data-lang="fr" title="Français">
-                <img src="https://flagcdn.com/w80/fr.png" alt="FR">
-            </button>
-            <button class="conf-lang-btn" data-lang="de" title="Deutsch">
-                <img src="https://flagcdn.com/w80/de.png" alt="DE">
+        <!-- Onderste balk: nieuwe bestelling knop -->
+        <div class="conf-bottom-bar">
+            <button class="conf-new-order-btn" id="new-order-btn" data-i18n="confirmation.newOrder">
+                Nieuwe bestelling plaatsen
             </button>
         </div>
-        <button class="conf-new-order-btn" id="new-order-btn" data-i18n="confirmation.newOrder">
-            Place new order.
-        </button>
     </div>
 </div>
 
-<script src="assets/js/app.js"></script>
+<!-- ══ PRODUCT SUGGESTIE MODAL ══ -->
+<div id="pairing-modal" style="
+    display:none; position:fixed; inset:0; z-index:9000;
+    background:rgba(0,0,0,0.55); align-items:center; justify-content:center;
+">
+    <div style="
+        background:#fff; border-radius:24px; padding:40px 36px; max-width:480px; width:90%;
+        box-shadow:0 24px 64px rgba(0,0,0,0.25); text-align:center; position:relative;
+    ">
+        <img id="pairing-img" src="" alt="" style="
+            width:180px; height:180px; object-fit:cover; border-radius:16px;
+            margin-bottom:16px; display:block; margin-left:auto; margin-right:auto;
+            box-shadow:0 4px 16px rgba(0,0,0,0.12);
+        ">
+        <h2 style="font-size:22px; font-weight:800; color:#1a2e1c; margin-bottom:8px;" id="pairing-title">Lekker erbij!</h2>
+        <p style="font-size:15px; color:#6b8a6f; margin-bottom:6px;" id="pairing-desc"></p>
+        <p style="font-size:22px; font-weight:700; color:#3a7d44; margin-bottom:28px;" id="pairing-price"></p>
+        <div style="display:flex; gap:14px; justify-content:center;">
+            <button id="pairing-skip" style="
+                flex:1; padding:16px; border-radius:14px; border:2px solid #d0e0d2;
+                background:#fff; font-size:16px; font-weight:600; color:#6b8a6f; cursor:pointer;
+            ">Nee, dank je</button>
+            <button id="pairing-add" style="
+                flex:1; padding:16px; border-radius:14px; border:none;
+                background:#3a7d44; color:#fff; font-size:16px; font-weight:700; cursor:pointer;
+            ">Ja, voeg toe!</button>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/app.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

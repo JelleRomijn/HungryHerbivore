@@ -90,11 +90,18 @@ img {
     position: absolute;
     inset: 0;
     opacity: 0;
-    transition: opacity 1.2s ease;
+    z-index: 1;
+}
+
+.carousel-slide.carousel-prev {
+    opacity: 0.82;
+    z-index: 2;
 }
 
 .carousel-slide.active {
-    opacity: 0.45;
+    opacity: 0.82;
+    transition: opacity 1.2s ease;
+    z-index: 3;
 }
 
 .carousel-slide-inner {
@@ -118,10 +125,12 @@ img {
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%),
-        linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.5) 100%);
+        radial-gradient(ellipse at center, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.3) 100%);
     z-index: 1;
 }
+
+
 
 /* Groene gloed onderaan */
 .welcome-glow {
@@ -152,13 +161,29 @@ img {
 
 .welcome-logo {
     margin-bottom: 40px;
-    animation: pulseGentle 4s ease-in-out infinite;
 }
 
-.welcome-logo img {
+.welcome-logo-inner {
+    position: relative;
+    display: inline-block;
+}
+
+.welcome-logo-inner img {
+    display: block;
     width: 520px;
     height: auto;
     filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.6));
+}
+
+/* Dino GIF welkomstscherm */
+.welcome-dino-gif {
+    display: block;
+    width: 600px;
+    max-width: 90vw;
+    height: auto;
+    filter: drop-shadow(0 20px 60px rgba(0, 0, 0, 0.5));
+    border-radius: 12px;
+    background: transparent;
 }
 
 /* Tagline boven de knop */
@@ -292,6 +317,120 @@ img {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
+   DINE-IN / TAKEAWAY SCHERM
+   ═══════════════════════════════════════════════════════════════════════════════ */
+.dine-screen {
+    position: relative;
+    overflow: hidden;
+    background: var(--black);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.dine-bg {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 30% 60%, rgba(22,163,74,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse at 70% 40%, rgba(5,150,105,0.15) 0%, transparent 60%),
+        linear-gradient(135deg, #0a1a0d 0%, #0d2010 50%, #0a1a0d 100%);
+    z-index: 0;
+}
+
+.dine-center {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 40px;
+}
+
+.dine-title {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--white);
+    text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    letter-spacing: -0.01em;
+    text-align: center;
+}
+
+.dine-options {
+    display: flex;
+    gap: 40px;
+}
+
+.dine-btn {
+    width: 280px;
+    height: 300px;
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    color: var(--white);
+    font-size: 30px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+    cursor: pointer;
+}
+
+.dine-btn:hover, .dine-btn:active {
+    background: linear-gradient(135deg, var(--green-600), var(--emerald-600));
+    border-color: var(--green-400);
+    transform: scale(1.04) translateY(-4px);
+    box-shadow: 0 24px 60px rgba(22,163,74,0.35);
+}
+
+.dine-btn-icon {
+    width: 96px;
+    height: 96px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dine-btn-icon svg {
+    width: 52px;
+    height: 52px;
+}
+
+.dine-back-btn {
+    position: absolute;
+    top: 28px;
+    left: 28px;
+    z-index: 20;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.1);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+}
+
+.dine-back-btn svg {
+    width: 28px;
+    height: 28px;
+}
+
+.dine-back-btn:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
    BESTELSCHERM
    ═══════════════════════════════════════════════════════════════════════════════ */
 .order-screen {
@@ -315,21 +454,25 @@ img {
 }
 
 .sidebar-brand {
+    
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     margin-bottom: 8px;
 }
 
 .sidebar-logo-small {
-    width: 70px;
+    width: 200px;
     height: auto;
+    flex-shrink: 0;
+    margin-left: -30px;
     margin-top: -20px;
 }
 
 .sidebar-logo-text {
-    width: 140px;
+    width: 165px;
     height: auto;
+    margin-left: 50px;
     margin-top: -20px;
 }
 
@@ -345,6 +488,123 @@ img {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Taalvlaggen onderaan sidebar - inklap menu */
+.sidebar-lang-flags {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    position: relative;
+}
+
+.sidebar-lang-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 10px;
+}
+
+.sidebar-lang-toggle:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.35);
+}
+
+.sidebar-lang-toggle-flag {
+    width: 42px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 4px;
+    pointer-events: none;
+    display: block;
+}
+
+.sidebar-lang-toggle-label {
+    flex: 1;
+    color: rgba(255,255,255,0.9);
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.sidebar-lang-toggle-arrow {
+    color: rgba(255,255,255,0.7);
+    transition: transform 0.25s ease;
+    flex-shrink: 0;
+}
+
+.sidebar-lang-toggle.open .sidebar-lang-toggle-arrow {
+    transform: rotate(180deg);
+}
+
+.sidebar-lang-dropdown {
+    display: none;
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 16px;
+    right: 16px;
+    background: rgba(20, 90, 50, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 8px;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 -8px 28px rgba(0,0,0,0.35);
+    z-index: 100;
+}
+
+.sidebar-lang-dropdown.open {
+    display: flex;
+}
+
+.sidebar-lang-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid transparent;
+    padding: 0 12px;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar-lang-btn img {
+    width: 36px;
+    height: 26px;
+    object-fit: cover;
+    border-radius: 3px;
+    pointer-events: none;
+    display: block;
+    flex-shrink: 0;
+}
+
+.sidebar-lang-btn-label {
+    color: rgba(255,255,255,0.85);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.sidebar-lang-btn:hover {
+    background: rgba(255,255,255,0.2);
+    border-color: rgba(255,255,255,0.35);
+}
+
+.sidebar-lang-btn.active {
+    border-color: var(--green-400);
+    background: rgba(74,222,128,0.15);
+    box-shadow: 0 0 12px rgba(74,222,128,0.3);
 }
 
 .category-btn {
@@ -424,7 +684,7 @@ img {
 }
 
 .product-card-img {
-    height: 224px;
+    height: 320px;
     overflow: hidden;
     position: relative;
 }
@@ -432,7 +692,6 @@ img {
 .product-card-img img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
 }
 
 .product-badge {
@@ -729,22 +988,70 @@ img {
     margin-top: 4px;
 }
 
-.review-item-right {
-    text-align: right;
-    flex-shrink: 0;
-}
-
-.review-item-qty {
-    font-size: 22px;
-    color: var(--gray-600);
-    margin-bottom: 8px;
-}
-
 .review-item-price {
     font-size: 34px;
     font-weight: 700;
     color: var(--green-700);
 }
+
+.review-item-right {
+    text-align: right;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.review-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 4px 6px;
+}
+
+.review-qty-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    transition: background 0.15s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.review-qty-btn-minus {
+    background: var(--gray-200);
+    color: var(--gray-700);
+}
+
+.review-qty-btn-minus:hover {
+    background: var(--gray-300);
+}
+
+.review-qty-btn-plus {
+    background: var(--green-600);
+    color: var(--white);
+}
+
+.review-qty-btn-plus:hover {
+    background: var(--green-700);
+}
+
+.review-qty-value {
+    font-size: 20px;
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+    color: var(--gray-800);
+}
+
 
 /* Bewerk bestelling knop */
 .edit-order-btn {
@@ -817,6 +1124,13 @@ img {
 
 .review-totals-row.total-row .total-value {
     color: var(--green-600);
+}
+
+.review-incl-btw {
+    font-size: 18px;
+    color: var(--gray-500);
+    justify-content: flex-end;
+    padding-top: 2px;
 }
 
 .confirm-order-btn {
@@ -1076,88 +1390,174 @@ img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.85;
+    animation: confBgZoom 20s ease-in-out infinite alternate;
 }
 
-/* Bovenste balk met bedankje + order naam */
-.conf-top-bar {
+.conf-bg-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at center, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 100%),
+        linear-gradient(180deg, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.05) 60%, rgba(0,0,0,0.6) 100%);
+}
+
+@keyframes confBgZoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.08); }
+}
+
+/* Content wrapper */
+.conf-content {
     position: relative;
     z-index: 10;
     display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 28px 32px 20px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 40px;
 }
 
-.conf-thanks {
+/* Bevestigingskaart (glassmorphism) */
+.conf-card {
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 32px;
+    padding: 56px 64px;
+    text-align: center;
+    box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    animation: confCardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    max-width: 560px;
+    width: 100%;
+}
+
+@keyframes confCardIn {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Vinkje icoon */
+.conf-card-icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--green-400), var(--green-600));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 28px;
+    box-shadow:
+        0 12px 40px rgba(22, 163, 74, 0.4),
+        0 0 0 0 rgba(22, 163, 74, 0.3);
+    animation: confCheckPulse 2s ease-in-out infinite;
+}
+
+.conf-card-icon svg {
+    width: 48px;
+    height: 48px;
     color: var(--white);
+    stroke-width: 3;
 }
 
-.conf-thanks h2 {
-    font-size: 24px;
-    font-weight: 700;
-    line-height: 1.3;
-    margin-bottom: 2px;
+@keyframes confCheckPulse {
+    0%, 100% {
+        box-shadow: 0 12px 40px rgba(22, 163, 74, 0.4), 0 0 0 0 rgba(22, 163, 74, 0.3);
+    }
+    50% {
+        box-shadow: 0 12px 40px rgba(22, 163, 74, 0.5), 0 0 0 16px rgba(22, 163, 74, 0);
+    }
 }
 
-.conf-thanks p {
-    font-size: 20px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.9);
-}
-
-.conf-order-name {
-    text-align: right;
-    color: var(--white);
-}
-
-.conf-order-name .conf-name-value {
-    font-size: 48px;
+.conf-card-title {
+    font-size: 52px;
     font-weight: 800;
-    line-height: 1.1;
+    color: var(--white);
+    margin-bottom: 8px;
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.01em;
 }
 
-.conf-order-name .conf-name-label {
-    font-size: 16px;
-    color: rgba(255,255,255,0.75);
+.conf-card-subtitle {
+    font-size: 22px;
     font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+    margin-bottom: 36px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* Midden: logo overlay (optioneel, al in achtergrond) */
-.conf-center-spacer {
-    flex: 1;
-    position: relative;
-    z-index: 5;
+/* Bestelnummer badge */
+.conf-order-badge {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 24px 40px;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.conf-order-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.65);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.conf-order-number {
+    font-size: 140px;
+    font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+    text-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+    letter-spacing: 0.04em;
 }
 
 /* Onderste balk */
 .conf-bottom-bar {
-    position: relative;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 10;
-    padding: 20px 24px 28px;
-    background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+    padding: 24px 32px 32px;
+    background: linear-gradient(0deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.35) 60%, transparent 100%);
     display: flex;
     align-items: flex-end;
+    justify-content: center;
     gap: 16px;
 }
 
 /* Taalvlaggen in bevestigingsscherm */
 .conf-lang-flags {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
 .conf-lang-btn {
-    width: 44px;
-    height: 32px;
-    border-radius: 4px;
+    width: 52px;
+    height: 38px;
+    border-radius: 8px;
     overflow: hidden;
-    background: rgba(255,255,255,0.15);
-    border: 2px solid transparent;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(255,255,255,0.15);
     padding: 0;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .conf-lang-btn img {
@@ -1169,31 +1569,65 @@ img {
 
 .conf-lang-btn.active {
     border-color: var(--green-400);
-    box-shadow: 0 0 12px rgba(74,222,128,0.5);
+    box-shadow: 0 0 16px rgba(74,222,128,0.5);
+    transform: scale(1.1);
 }
 
 .conf-lang-btn:hover {
-    border-color: rgba(255,255,255,0.6);
+    border-color: rgba(255,255,255,0.5);
+    background: rgba(255,255,255,0.25);
 }
 
 /* Nieuwe bestelling knop */
 .conf-new-order-btn {
     flex: 1;
-    background: var(--green-600);
+    background: linear-gradient(135deg, var(--green-600), var(--emerald-600));
     color: var(--white);
-    padding: 18px 32px;
-    border-radius: 12px;
-    font-size: 22px;
+    padding: 22px 40px;
+    border-radius: 16px;
+    font-size: 24px;
     font-weight: 700;
     text-align: center;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-    transition: all 0.15s ease;
+    box-shadow:
+        0 12px 32px rgba(0,0,0,0.3),
+        0 0 0 0 rgba(22, 163, 74, 0.4);
+    transition: all 0.2s ease;
+    animation: confBtnGlow 2.5s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+}
+
+.conf-new-order-btn::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 40%,
+        rgba(255,255,255,0.1) 50%,
+        transparent 60%
+    );
+    animation: sheen 3.5s ease-in-out infinite;
 }
 
 .conf-new-order-btn:hover {
-    background: var(--green-700);
-    transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+    background: linear-gradient(135deg, var(--green-700), var(--emerald-700));
+    transform: translateY(-3px);
+    box-shadow:
+        0 16px 40px rgba(0,0,0,0.4),
+        0 0 24px rgba(22, 163, 74, 0.3);
+}
+
+@keyframes confBtnGlow {
+    0%, 100% {
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 0 0 rgba(22,163,74,0.4);
+    }
+    50% {
+        box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 32px 4px rgba(22,163,74,0.15);
+    }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -1296,4 +1730,76 @@ img {
     .upsell-grid {
         grid-template-columns: 1fr;
     }
+}
+
+/* ── Personeel: bonprinter knop ── */
+.staff-printer-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.45);
+    color: #fff;
+    font-size: 22px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: background 0.2s;
+    pointer-events: all;
+}
+.staff-printer-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   QR KORTINGSBADGE & REVIEW KORTING
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cart-discount-badge {
+    display: inline-flex;
+    align-items: center;
+    background: #ff6f00;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-left: 8px;
+    box-shadow: 0 2px 8px rgba(255,111,0,0.4);
+    animation: badgePop 0.4s cubic-bezier(.175,.885,.32,1.275) both;
+}
+
+@keyframes badgePop {
+    from { opacity: 0; transform: scale(0.5); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.review-totals-row.subtotal-row {
+    color: #888;
+    font-size: 18px;
+}
+
+.review-totals-row.discount-row {
+    color: #2d7a3a;
+    font-weight: 700;
+    font-size: 22px;
+}
+
+.review-totals-row.discount-row .discount-label-text {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.review-totals-row.discount-row .discount-value {
+    color: #2d7a3a;
+    font-weight: 700;
 }

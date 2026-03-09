@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonprinter – Happy Herbivore</title>
+<style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: linear-gradient(135deg, #1a472a 0%, #2d7a3a 60%, #4caf50 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 30px 16px 40px;
+    }
+
+    .page-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        width: 100%;
+        max-width: 420px;
+    }
+
+    /* ── Brand header ── */
+    .brand-header {
+        text-align: center;
+        color: #fff;
+    }
+    .brand-header h1 {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .brand-header p {
+        font-size: 13px;
+        opacity: 0.8;
+        margin-top: 2px;
+    }
+
+    /* ── Control card ── */
+    .control-card {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.35);
+        padding: 24px;
+        width: 100%;
+    }
+
+    .status {
+        padding: 11px 16px;
+        border-radius: 10px;
+        margin-bottom: 18px;
+        font-size: 13px;
+        font-weight: 600;
+        text-align: center;
+        background: #f3f4f6;
+        color: #374151;
+    }
+    .status.success { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+    .status.error   { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+    .status.loading { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+
+    .webusb-warning {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 10px;
+        padding: 11px 14px;
+        font-size: 12px;
+        color: #9a3412;
+        margin-bottom: 16px;
+        display: none;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    button.btn {
+        flex: 1;
+        padding: 13px 10px;
+        font-size: 14px;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: all 0.2s ease;
+    }
+
+    .btn-print { background: #15803d; color: white; }
+    .btn-print:hover:not(:disabled) {
+        background: #166534;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(21,128,61,0.4);
+    }
+    .btn-refresh { background: #e5e7eb; color: #374151; flex: 0 0 auto; padding: 13px 16px; }
+    .btn-refresh:hover { background: #d1d5db; }
+    .btn-select  { background: #374151; color: white; flex: 0 0 auto; padding: 13px 16px; }
+    .btn-select:hover { background: #1f2937; }
+    .btn-test    { background: #7c3aed; color: white; flex: 0 0 auto; padding: 13px 16px; }
+    .btn-test:hover { background: #6d28d9; }
+
+    button:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+
+    .debug-toggle {
+        background: none; border: none; color: #9ca3af;
+        font-size: 11px; cursor: pointer; display: block;
+        margin: 12px auto 0; text-decoration: underline;
+    }
+
+    .debug-console {
+        background: #111827; color: #a3e635;
+        font-family: monospace; font-size: 11px;
+        border-radius: 8px; padding: 10px;
+        margin-top: 12px; height: 140px;
+        overflow-y: auto; white-space: pre-wrap;
+        word-break: break-all; display: none;
+    }
+
+    /* ── Receipt preview ── */
+    .receipt-wrap {
+        width: 100%;
+        filter: drop-shadow(0 8px 24px rgba(0,0,0,0.35));
+    }
+
+    .receipt-paper {
+        background: #fff;
+        border-radius: 4px 4px 0 0;
+        padding: 28px 24px 20px;
+        font-family: 'Courier New', monospace;
+        position: relative;
+    }
+
+    /* Torn bottom edge */
+    .receipt-tear {
+        height: 20px;
+        background: linear-gradient(-45deg, #fff 33%, transparent 33%) 0 0,
+                    linear-gradient( 45deg, #fff 33%, transparent 33%) 0 0;
+        background-size: 12px 20px;
+        background-color: transparent;
+        background-repeat: repeat-x;
+    }
+
+    .receipt-header {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+    .receipt-logo {
+        width: 64px;
+        height: 64px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto 8px;
+    }
+    .receipt-brand {
+        font-size: 18px;
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #111;
+        text-transform: uppercase;
+    }
+    .receipt-tagline {
+        font-size: 11px;
+        color: #666;
+        margin-top: 2px;
+        font-family: Arial, sans-serif;
+    }
+    .receipt-divider {
+        border: none;
+        border-top: 1px dashed #bbb;
+        margin: 12px 0;
+    }
+    .receipt-divider.solid {
+        border-top: 2px solid #222;
+    }
+
+    .receipt-meta {
+        font-size: 11px;
+        color: #555;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+    }
+
+    .receipt-order-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+    .receipt-type-badge {
+        font-size: 12px;
+        font-weight: 700;
+        background: #f3f4f6;
+        color: #374151;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-family: Arial, sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .receipt-number {
+        font-size: 28px;
+        font-weight: 900;
+        color: #15803d;
+    }
+
+    .receipt-items { margin: 4px 0 8px; }
+    .receipt-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12.5px;
+        padding: 3px 0;
+        color: #222;
+        font-family: Arial, sans-serif;
+    }
+    .receipt-item-left { display: flex; gap: 6px; }
+    .receipt-item-qty  { color: #888; min-width: 22px; }
+    .receipt-item-price { font-weight: 600; }
+
+    .receipt-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 6px 0 2px;
+        font-family: Arial, sans-serif;
+    }
+    .receipt-total-label { font-size: 13px; font-weight: 700; color: #111; }
+    .receipt-total-amount { font-size: 22px; font-weight: 900; color: #15803d; }
+
+    /* QR section */
+    .receipt-qr-section {
+        text-align: center;
+        padding: 14px 0 6px;
+    }
+    .receipt-qr-section img {
+        width: 110px;
+        height: 110px;
+        image-rendering: pixelated;
+        border: 3px solid #fff;
+        outline: 1px solid #e5e7eb;
+        border-radius: 4px;
+    }
+    .receipt-qr-label {
+        font-size: 11px;
+        color: #555;
+        font-family: Arial, sans-serif;
+        margin-top: 6px;
+        line-height: 1.4;
+    }
+    .receipt-qr-label strong {
+        color: #15803d;
+        font-size: 12px;
+        display: block;
+    }
+
+    .receipt-footer {
+        text-align: center;
+        font-size: 11px;
+        color: #888;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin-top: 8px;
+    }
+
+    .no-order-msg {
+        text-align: center;
+        color: rgba(255,255,255,0.7);
+        font-size: 14px;
+        padding: 20px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 14px;
+        width: 100%;
+    }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+    <div class="brand-header">
+        <h1>🌿 Happy Herbivore</h1>
+        <p>Bonprinter</p>
+    </div>
+
+    <!-- Control card -->
+    <div class="control-card">
+        <div class="status" id="status">Bestelling laden...</div>
+
+        <div class="webusb-warning" id="usbWarning">
+            ⚠️ WebUSB niet ondersteund in deze browser. Gebruik Chrome of Edge voor USB-printen.
+        </div>
+
+        <div class="button-group">
+            <button class="btn btn-print" id="btnPrint" onclick="printUSB()" disabled>🖨️ Print Bon</button>
+            <button class="btn btn-test"  onclick="printTest()"    title="Test print">🧪</button>
+            <button class="btn btn-select" onclick="selectPrinter()" title="Printer selecteren">⚙️</button>
+            <button class="btn btn-refresh" onclick="loadOrder()"  title="Vernieuwen">🔄</button>
+        </div>
+
+        <button class="debug-toggle" onclick="toggleDebug()">Debug console tonen</button>
+        <div class="debug-console" id="debugConsole">Debug log...</div>
+    </div>
+
+    <!-- Receipt preview -->
+    <div class="receipt-wrap" id="receiptWrap" style="display:none;">
+        <div class="receipt-paper" id="receiptPaper">
+
+            <div class="receipt-header">
+                <img class="receipt-logo" src="img/logo_big_happy_herbivore_transparent.png"
+                     alt="Happy Herbivore" onerror="this.style.display='none'">
+                <div class="receipt-brand">Happy Herbivore</div>
+                <div class="receipt-tagline">Gezond · Vers · Plantaardig</div>
+            </div>
+
+            <hr class="receipt-divider solid">
+
+            <div class="receipt-meta">
+                <span id="receiptDate"></span>
+                <span id="receiptTime"></span>
+            </div>
+
+            <div class="receipt-order-row">
+                <span class="receipt-type-badge" id="receiptType"></span>
+                <span class="receipt-number" id="receiptNumber">#–</span>
+            </div>
+
+            <hr class="receipt-divider">
+
+            <div class="receipt-items" id="receiptItems"></div>
+
+            <hr class="receipt-divider solid">
+
+            <div class="receipt-total-row">
+                <span class="receipt-total-label">TOTAAL</span>
+                <span class="receipt-total-amount" id="receiptTotal"></span>
+            </div>
+
+            <hr class="receipt-divider">
+
+            <div class="receipt-qr-section">
+                <img id="receiptQrImg" src="" alt="QR code">
+                <div class="receipt-qr-label">
+                    <strong>10% korting op je volgende bestelling!</strong>
+                    Scan de QR-code of ga naar<br>hungryherb.be/korting
+                </div>
+            </div>
+
+            <hr class="receipt-divider">
+
+            <div class="receipt-footer">
+                Bedankt voor je bezoek!<br>
+                Wij zien je graag terug 🌿
+            </div>
+        </div>
+        <div class="receipt-tear"></div>
+    </div>
+
+    <div class="no-order-msg" id="noOrder" style="display:none;">
+        Geen bestelling gevonden.<br>Plaats eerst een bestelling via de kiosk.
+    </div>
+
+</div>
+
+<script>
+    let orderData     = null;
+    let selectedDevice = null;
+
+    const PRINTER_VENDORS = [
+        0x0483, 0x04b8, 0x0456, 0x067b,
+        0x6868, 0x28e9, 0x0519,
+    ];
+
+    const W = 36;
+
+    /* URL that the QR code points to */
+    const QR_URL = (function() {
+        var base = window.location.origin + window.location.pathname.replace('bonprinter.html', '');
+        return base + 'qr.html';
+    })();
+
+    /* ── Status helper ─────────────────────────────────────────────── */
+    function updateStatus(msg, type) {
+        var el = document.getElementById('status');
+        el.textContent = msg;
+        el.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    /* ── Load order from localStorage ──────────────────────────────── */
+    function loadOrder() {
+        var raw = null;
+        try { raw = localStorage.getItem('lastOrder'); } catch(e) {}
+
+        if (!raw) {
+            document.getElementById('receiptWrap').style.display = 'none';
+            document.getElementById('noOrder').style.display = 'block';
+            document.getElementById('btnPrint').disabled = true;
+            updateStatus('Geen bestelling gevonden.', 'error');
+            return;
+        }
+
+        try {
+            orderData = JSON.parse(raw);
+        } catch(e) {
+            updateStatus('Ongeldige besteldata.', 'error');
+            return;
+        }
+
+        renderReceiptPreview(orderData);
+        document.getElementById('btnPrint').disabled = false;
+        updateStatus('Bestelling #' + orderData.pickupNumber + ' geladen – klaar om te printen.', 'success');
+    }
+
+    /* ── Render receipt preview ─────────────────────────────────────── */
+    function renderReceiptPreview(order) {
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        var timeStr = now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+        document.getElementById('receiptDate').textContent = dateStr;
+        document.getElementById('receiptTime').textContent = timeStr;
+        document.getElementById('receiptNumber').textContent = '#' + order.pickupNumber;
+        document.getElementById('receiptType').textContent =
+            order.orderType === 'takeaway' ? '🛍 Meenemen' : '🍽 Hier eten';
+        document.getElementById('receiptTotal').textContent =
+            '€\u202f' + order.total.toFixed(2).replace('.', ',');
+
+        var itemsEl = document.getElementById('receiptItems');
+        itemsEl.innerHTML = '';
+        order.items.forEach(function(item) {
+            var row = document.createElement('div');
+            row.className = 'receipt-item';
+            row.innerHTML =
+                '<span class="receipt-item-left">' +
+                  '<span class="receipt-item-qty">' + item.qty + 'x</span>' +
+                  '<span>' + escHtml(item.title) + '</span>' +
+                '</span>' +
+                '<span class="receipt-item-price">€\u202f' +
+                  (item.qty * item.price).toFixed(2).replace('.', ',') +
+                '</span>';
+            itemsEl.appendChild(row);
+        });
+
+        /* QR code via free API */
+        var qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=6&data=' +
+                    encodeURIComponent(QR_URL);
+        document.getElementById('receiptQrImg').src = qrSrc;
+
+        document.getElementById('receiptWrap').style.display = 'block';
+        document.getElementById('noOrder').style.display = 'none';
+    }
+
+    function escHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    /* ── Pad helpers for monospace receipt ──────────────────────────── */
+    function padLine(left, right) {
+        var space = W - left.length - right.length;
+        return left + ' '.repeat(Math.max(1, space)) + right;
+    }
+
+    function center(text) {
+        var pad = Math.max(0, Math.floor((W - text.length) / 2));
+        return ' '.repeat(pad) + text;
+    }
+
+    /* ── ESC/POS QR code bytes ──────────────────────────────────────── */
+    function escposQR(url) {
+        var GS = '\x1D';
+        var data = url;
+        var len  = data.length + 3;
+        var pL   = len & 0xFF;
+        var pH   = (len >> 8) & 0xFF;
+        return (
+            GS + '\x28\x6B\x04\x00\x31\x41\x32\x00' +          // model 2
+            GS + '\x28\x6B\x03\x00\x31\x43\x06'     +          // module size 6
+            GS + '\x28\x6B\x03\x00\x31\x45\x31'     +          // error correction L
+            GS + '\x28\x6B' + String.fromCharCode(pL) + String.fromCharCode(pH) +
+                 '\x31\x50\x30' + data                +          // store data
+            GS + '\x28\x6B\x03\x00\x31\x51\x30'                 // print QR
+        );
+    }
+
+    /* ── Build ESC/POS byte string ──────────────────────────────────── */
+    function buildESCPOS(order) {
+        var ESC = '\x1B', GS = '\x1D';
+        var now = new Date();
+        var dateStr = now.toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        var timeStr = now.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+        var r = '';
+
+        r += ESC + '@';
+
+        /* ── Header ── */
+        r += ESC + 'a\x01';
+        r += ESC + '!\x30';
+        r += 'HAPPY HERBIVORE\n';
+        r += ESC + '!\x00';
+        r += 'Gezond - Vers - Plantaardig\n';
+        r += '\n';
+
+        /* ── Order info ── */
+        r += ESC + 'a\x00';
+        r += '='.repeat(W) + '\n';
+        r += ESC + '!\x08';
+        r += (order.orderType === 'takeaway' ? '  MEENEMEN' : '  HIER ETEN') + '\n';
+        r += ESC + '!\x00';
+        r += 'Bestelnr : #' + order.pickupNumber + '\n';
+        r += 'Datum    : ' + dateStr + '  ' + timeStr + '\n';
+        r += '='.repeat(W) + '\n';
+        r += '\n';
+
+        /* ── Items ── */
+        order.items.forEach(function(item) {
+            var left  = item.qty + 'x ' + item.title;
+            var right = 'EUR ' + (item.qty * item.price).toFixed(2);
+            if (left.length + right.length + 1 > W) {
+                left = left.substring(0, W - right.length - 2);
+            }
+            r += padLine(left, right) + '\n';
+        });
+
+        /* ── Total ── */
+        r += '\n';
+        r += '-'.repeat(W) + '\n';
+        r += ESC + '!\x18';
+        r += padLine('TOTAAL', 'EUR ' + order.total.toFixed(2)) + '\n';
+        r += ESC + '!\x00';
+        r += '\n';
+
+        /* ── QR code ── */
+        r += ESC + 'a\x01';
+        r += '-'.repeat(W) + '\n';
+        r += ESC + '!\x00';
+        r += '10% korting op je volgende bestelling!\n';
+        r += 'Scan de QR-code hieronder\n';
+        r += '\n';
+        r += escposQR(QR_URL);
+        r += '\n';
+        r += ESC + 'a\x01';
+        r += 'Bedankt voor je bezoek!\n';
+        r += 'Wij zien je graag terug :)\n';
+        r += '\n\n\n';
+        r += GS + 'V\x00';
+
+        return r;
+    }
+
+    /* ── Select USB printer ─────────────────────────────────────────── */
+    async function selectPrinter() {
+        try {
+            if (!navigator.usb) throw new Error('WebUSB niet ondersteund');
+            var filters = PRINTER_VENDORS.map(function(v) { return { vendorId: v }; });
+            selectedDevice = await navigator.usb.requestDevice({ filters: filters });
+            updateStatus('✓ Printer geselecteerd: ' + (selectedDevice.productName || 'Onbekend'), 'success');
+        } catch(e) {
+            if (e.name !== 'NotFoundError') updateStatus('Printer selectie mislukt: ' + e.message, 'error');
+        }
+    }
+
+    async function autoDetectPrinter() {
+        try {
+            if (!navigator.usb) return false;
+            var devices = await navigator.usb.getDevices();
+            var printer = devices.find(function(d) { return PRINTER_VENDORS.includes(d.vendorId); });
+            if (printer) { selectedDevice = printer; return true; }
+            return false;
+        } catch(e) { return false; }
+    }
+
+    /* ── Print via USB ──────────────────────────────────────────────── */
+    async function printUSB() {
+        if (!orderData) { updateStatus('Geen bestelling om te printen.', 'error'); return; }
+        if (!navigator.usb) { updateStatus('WebUSB niet ondersteund. Gebruik Chrome of Edge.', 'error'); return; }
+
+        try {
+            updateStatus('Printer verbinden...', 'loading');
+            if (!selectedDevice) {
+                var found = await autoDetectPrinter();
+                if (!found) await selectPrinter();
+                if (!selectedDevice) return;
+            }
+
+            await selectedDevice.open();
+            if (selectedDevice.configuration === null) await selectedDevice.selectConfiguration(1);
+            try { await selectedDevice.claimInterface(0); } catch(e) {}
+
+            var intf     = selectedDevice.configuration.interfaces[0].alternates[0];
+            var endpoint = intf.endpoints.find(function(e) { return e.direction === 'out'; });
+            if (!endpoint) throw new Error('Output endpoint niet gevonden');
+
+            var receipt = buildESCPOS(orderData);
+            var encoder = new TextEncoder();
+            await selectedDevice.transferOut(endpoint.endpointNumber, encoder.encode(receipt));
+
+            updateStatus('✓ Bon succesvol geprint!', 'success');
+            setTimeout(function() { try { selectedDevice.close(); } catch(e) {} }, 1000);
+
+        } catch(e) {
+            updateStatus('Printfout: ' + e.message, 'error');
+            console.error('USB Print Error:', e);
+        }
+    }
+
+    /* ── Debug console ──────────────────────────────────────────────── */
+    function logConsole(msg) {
+        var c = document.getElementById('debugConsole');
+        c.textContent += '\n[' + new Date().toLocaleTimeString() + '] ' + msg;
+        c.scrollTop = c.scrollHeight;
+    }
+
+    function toggleDebug() {
+        var c   = document.getElementById('debugConsole');
+        var btn = document.querySelector('.debug-toggle');
+        var vis = c.style.display === 'block';
+        c.style.display = vis ? 'none' : 'block';
+        btn.textContent  = vis ? 'Debug console tonen' : 'Debug console verbergen';
+    }
+
+    /* ── Test print ─────────────────────────────────────────────────── */
+    async function printTest() {
+        logConsole('Test print gestart');
+        var testOrder = {
+            pickupNumber: 42,
+            orderType: 'takeaway',
+            items: [
+                { qty: 1, title: 'Avocado Wrap',    price: 8.50 },
+                { qty: 2, title: 'Groene Smoothie',  price: 4.50 },
+                { qty: 1, title: 'Falafel Bowl',    price: 9.00 }
+            ],
+            total: 26.50
+        };
+
+        /* Altijd de visuele preview tonen (ook zonder printer) */
+        renderReceiptPreview(testOrder);
+        document.getElementById('noOrder').style.display = 'none';
+        updateStatus('Testbestelling #42 geladen – preview zichtbaar.', 'success');
+
+        try {
+            if (!navigator.usb) { logConsole('WebUSB niet ondersteund – preview wel zichtbaar'); return; }
+            if (!selectedDevice) {
+                logConsole('Printer zoeken...');
+                var found = await autoDetectPrinter();
+                if (!found) { logConsole('Handmatig selecteren'); await selectPrinter(); }
+                if (!selectedDevice) { logConsole('Geen printer geselecteerd'); return; }
+            }
+            logConsole('Printer openen: ' + (selectedDevice.productName || 'Onbekend'));
+            await selectedDevice.open();
+            if (selectedDevice.configuration === null) { await selectedDevice.selectConfiguration(1); logConsole('Config geselecteerd'); }
+            try { await selectedDevice.claimInterface(0); logConsole('Interface geclaimd'); } catch(e) { logConsole('Interface fout (doorgaan): ' + e.message); }
+
+            var intf     = selectedDevice.configuration.interfaces[0].alternates[0];
+            var endpoint = intf.endpoints.find(function(e) { return e.direction === 'out'; });
+            if (!endpoint) throw new Error('Geen output endpoint gevonden');
+            logConsole('Endpoint: ' + endpoint.endpointNumber);
+
+            await selectedDevice.transferOut(endpoint.endpointNumber, new TextEncoder().encode(buildESCPOS(testOrder)));
+            logConsole('Test bon verstuurd ✓');
+            updateStatus('✓ Test bon geprint!', 'success');
+            setTimeout(function() { try { selectedDevice.close(); logConsole('Printer gesloten'); } catch(e) {} }, 1000);
+
+        } catch(e) {
+            logConsole('FOUT: ' + e.message);
+            updateStatus('Test print fout: ' + e.message, 'error');
+        }
+    }
+
+    /* ── Init ───────────────────────────────────────────────────────── */
+    window.addEventListener('load', async function() {
+        loadOrder();
+        if (!navigator.usb) {
+            document.getElementById('usbWarning').style.display = 'block';
+            logConsole('WebUSB niet beschikbaar in deze browser');
+            return;
+        }
+        logConsole('WebUSB beschikbaar, printer zoeken...');
+        var found = await autoDetectPrinter();
+        if (found) {
+            logConsole('Printer automatisch gevonden – bon wordt geprint...');
+            updateStatus('Printer gevonden, bon wordt geprint...', 'loading');
+            setTimeout(async function() { await printUSB(); }, 600);
+        } else {
+            logConsole('Geen printer gevonden, selecteer handmatig');
+        }
+    });
+</script>
+
+</body>
+</html>
