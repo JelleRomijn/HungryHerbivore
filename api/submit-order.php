@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 $config = [
-    'host' => 'localhost',
-    'user' => 'u240903_kiosk',
-    'pass' => '2dVMTZjGJ4YzBDdShtMG',
-    'name' => 'u240903_kiosk',
+    'host' => '127.0.0.1',
+    'user' => 'root',
+    'pass' => '',
+    'name' => 'products',
 ];
 
 $mysqli = @new mysqli($config['host'], $config['user'], $config['pass'], $config['name']);
