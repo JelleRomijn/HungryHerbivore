@@ -4,6 +4,10 @@ Zelfbedieningskiosk voor **Happy Herbivore**, een plantaardig restaurantconcept.
 Gebouwd met PHP, MySQL en vanilla JavaScript. Geen frameworks.
 
 ---
+de video van de kiosk
+(https://youtube.com/shorts/j24spOkuVNE)
+
+---
 
 ## Wat is er gemaakt
 
