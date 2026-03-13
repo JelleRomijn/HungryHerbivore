@@ -450,9 +450,11 @@ $upsellItems  = array_merge($upsellDrinks, $upsellSauces);
      ═══════════════════════════════════════════════════════════════════════════════ -->
 <div class="screen upsell-screen" data-screen="upsell">
     <div class="upsell-header">
-        <div class="upsell-countdown" id="upsell-countdown">15s</div>
-        <h1 data-i18n="upsell.title">Maak het nog beter! &#127793;</h1>
-        <p data-i18n="upsell.subtitle">Voeg deze gezonde extras toe aan je bestelling</p>
+        <div class="upsell-header-content">
+            <h1 data-i18n="upsell.title">Maak het compleet</h1>
+            <p data-i18n="upsell.subtitle">Voeg een drankje of saus toe aan je bestelling</p>
+        </div>
+        <div class="upsell-countdown" id="upsell-countdown">30s</div>
     </div>
 
     <div class="upsell-items-wrapper">
@@ -467,7 +469,7 @@ $upsellItems  = array_merge($upsellDrinks, $upsellSauces);
                     <div class="upsell-selected-overlay">
                         <div class="upsell-check-circle">
                             <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                                <polyline points="20 6 9 17 4 12"/>
                             </svg>
                         </div>
                     </div>
@@ -488,9 +490,6 @@ $upsellItems  = array_merge($upsellDrinks, $upsellSauces);
     <div class="upsell-footer">
         <div class="upsell-footer-inner">
             <button class="upsell-skip-btn" id="upsell-skip-btn">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
                 <span data-i18n="upsell.noThanks">Nee Bedankt</span>
             </button>
             <button class="upsell-add-btn" id="upsell-add-btn" disabled data-i18n="upsell.selectItems">

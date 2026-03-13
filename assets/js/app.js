@@ -33,8 +33,8 @@
             'review.title': 'Bekijk je bestelling',
             'review.subtitle': 'Controleer je items voordat je afrekent',
             'review.qty': 'Aantal',
-            'upsell.title': 'Maak het nog beter! \u{1F331}',
-            'upsell.subtitle': 'Voeg deze gezonde extras toe aan je bestelling',
+            'upsell.title': 'Maak het compleet',
+            'upsell.subtitle': 'Voeg een drankje of saus toe aan je bestelling',
             'upsell.noThanks': 'Nee Bedankt',
             'upsell.addItems': 'Items Toevoegen',
             'upsell.selectItems': 'Selecteer items om toe te voegen',
@@ -72,8 +72,8 @@
             'review.title': 'Review Your Order',
             'review.subtitle': 'Check your items before checkout',
             'review.qty': 'Qty',
-            'upsell.title': 'Boost Your Order! \u{1F331}',
-            'upsell.subtitle': 'Add these healthy extras to complete your meal',
+            'upsell.title': 'Complete Your Order',
+            'upsell.subtitle': 'Add a drink or sauce to your meal',
             'upsell.noThanks': 'No Thanks',
             'upsell.addItems': 'Add Items',
             'upsell.selectItems': 'Select Items to Add',
@@ -111,8 +111,8 @@
             'review.title': 'V\u00e9rifiez votre commande',
             'review.subtitle': 'V\u00e9rifiez vos articles avant de payer',
             'review.qty': 'Qt\u00e9',
-            'upsell.title': 'Am\u00e9liorez votre commande! \u{1F331}',
-            'upsell.subtitle': 'Ajoutez ces extras sains pour compl\u00e9ter votre repas',
+            'upsell.title': 'Compl\u00e9tez votre commande',
+            'upsell.subtitle': 'Ajoutez une boisson ou une sauce \u00e0 votre repas',
             'upsell.noThanks': 'Non merci',
             'upsell.addItems': 'Ajouter des articles',
             'upsell.selectItems': 'S\u00e9lectionnez des articles \u00e0 ajouter',
@@ -150,8 +150,8 @@
             'review.title': '\u00dcberpr\u00fcfen Sie Ihre Bestellung',
             'review.subtitle': '\u00dcberpr\u00fcfen Sie Ihre Artikel vor dem Bezahlen',
             'review.qty': 'Menge',
-            'upsell.title': 'Verbessern Sie Ihre Bestellung! \u{1F331}',
-            'upsell.subtitle': 'F\u00fcgen Sie diese gesunden Extras hinzu',
+            'upsell.title': 'Bestellung vervollst\u00e4ndigen',
+            'upsell.subtitle': 'F\u00fcgen Sie ein Getr\u00e4nk oder eine So\u00dfe hinzu',
             'upsell.noThanks': 'Nein Danke',
             'upsell.addItems': 'Artikel hinzuf\u00fcgen',
             'upsell.selectItems': 'W\u00e4hlen Sie Artikel zum Hinzuf\u00fcgen',
@@ -277,7 +277,7 @@
     let orderType = 'dine-in';
     let selectedUpsellItems = [];
     let upsellTimer = null;
-    let upsellCountdown = 15;
+    let upsellCountdown = 30;
     let confirmationTimer = null;
     let discountPercent = 0;
 
@@ -753,7 +753,7 @@
        UPSELL SCHERM
        ═══════════════════════════════════════════════════════════════════════════ */
     function startUpsellCountdown() {
-        upsellCountdown = 15;
+        upsellCountdown = 30;
         selectedUpsellItems = [];
         updateUpsellUI();
 
