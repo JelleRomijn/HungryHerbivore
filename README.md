@@ -7,6 +7,9 @@ Gebouwd met PHP, MySQL en vanilla JavaScript. Geen frameworks.
 de video van de kiosk
 (https://youtube.com/shorts/j24spOkuVNE)
 
+Het Figma design
+https://www.figma.com/make/Vfz11kZYFx3EhUUX9esxi2/3D-Product-Showcase-Card--Community-?t=h6L1KoTlE50PTLlA-0
+
 ---
 
 ## Wat is er gemaakt
